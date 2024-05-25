@@ -1,24 +1,33 @@
-// This script injects a reminder popup into the page
-const reminderPopup = document.createElement('div');
-reminderPopup.innerHTML = `
-  <div class="reminder-popup">
-    <p>Remember your financial and retirement goals!</p>
-  </div>
-`;
-document.body.appendChild(reminderPopup);
+// content.js
 
-// Add some basic styles for the popup
-const styles = document.createElement('style');
-styles.innerHTML = `
-  .reminder-popup {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background: #fff;
-    border: 1px solid #ccc;
-    padding: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    z-index: 10000;
+console.log('Content script injected');
+
+function getSubtotal() {
+  const subtotalElement = document.querySelector('.sc-price');
+  if (subtotalElement) {
+    const subtotalText = subtotalElement.innerText || subtotalElement.textContent;
+    const subtotal = parseFloat(subtotalText.replace(/[^0-9.]+/g,""));
+    return isNaN(subtotal) ? 0 : subtotal;
   }
-`;
-document.head.appendChild(styles);
+  return 0;
+}
+
+
+function checkSpendingLimit() {
+  chrome.storage.sync.get(['spendingLimit'], function(data) {
+    console.log('Retrieved spending limit:', data.spendingLimit);
+    const spendingLimit = parseFloat(data.spendingLimit);
+    if (!isNaN(spendingLimit)) {
+      const subtotal = getSubtotal();
+      console.log('Subtotal:', subtotal);
+      if (subtotal > spendingLimit) {
+        alert(`Warning: Your subtotal of $${subtotal} exceeds your spending limit of $${spendingLimit}!`);
+      }
+    } else {
+      console.log('Invalid spending limit:', data.spendingLimit);
+    }
+  });
+}
+
+// Call checkSpendingLimit when the script is injected
+checkSpendingLimit();
