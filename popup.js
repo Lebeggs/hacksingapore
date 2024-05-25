@@ -1,4 +1,3 @@
-// popup.js
 document.getElementById('goals-form').addEventListener('submit', function(event) {
   event.preventDefault();
   const spendingLimit = document.getElementById('spending-limit').value;
@@ -15,6 +14,10 @@ document.getElementById('goals-form').addEventListener('submit', function(event)
   });
 });
 
+document.getElementById('learn-more').addEventListener('click', function() {
+  chrome.tabs.create({url: 'options.html'});
+});
+
 document.addEventListener('DOMContentLoaded', function() {
   chrome.storage.sync.get(['spendingLimit'], function(data) {
     if (chrome.runtime.lastError) {
@@ -28,4 +31,3 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 });
-
